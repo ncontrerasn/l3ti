@@ -1,169 +1,191 @@
-%------------------Punto 1---------------------%
-%Limpiamos la pantalla%
+%DMC
+
+%limpiar pantalla y formato de los números
 clc
-%Establecemos el formato long para mas presicion%
 format long
-%----------Pedimos los datos de entrada---------%
+
+%recibir datos de entrada
 printf("Datos de entrada\n\n");
-printf("Entrada -> P(X)\n");
-%Primero se pide el numero de elementos de P(x)
-colpx = input('Numero de elementos: ');
+printf("P(X)\n");
+
+%pedir el número de elementos de P(x)
+colpx = input('Número de elementos: ');
 px = [];
-#Se piden cada uno de los elementos de p(x)
-printf("Digite el valor para cada elemento: \n");
-for i=1:colpx
+
+#pedir cada uno de los elementos de p(x)
+printf("Digite la probabilidad para cada elemento: \n");
+for i = 1 : colpx
   printf("P(x_%i)",i);
-  px(i) = input("=");
+  px(i) = input(" = ");
 end
-#Hace el print del arreglo P(X)
-printf("\n El P(X) ingresado fue: ")
+
+#mostrar P(X)
+printf("\n El arreglo P(X) ingresado fue: ")
 disp(px);
-printf("\nEntrada -> P(Y|X)\n")
-#Se pide el numero de filas
-rowpyx = input('Digite el numero de filas: ');
-#Se pide el numero de columnas
-colpyx = input('Digite el numero de columnas: ');
+
+#construir P(Y|X)
+printf("P(Y|X)\n")
+
+#pedir el número de filas
+rowpyx = input('Digite el número de filas: ');
+
+#pedir el número de columnas
+colpyx = input('Digite el número de columnas: ');
 pyx = [];
-#Se peden cada uno de los elementos del arreglo P(Y|X)
-printf("Digite el valor para cada elemento: \n");
-for i=1:rowpyx
-  for j=1:colpyx
-    printf("P(y_%i|x_%i)",j,i);
-    pyx(i,j) = input("=");
+
+#pedir cada uno de los elementos de P(Y|X)
+printf("Digite la probabilidad para cada elemento: \n");
+for i = 1 : rowpyx
+  for j = 1 : colpyx
+    printf("P(y_%i|x_%i)", j, i);
+    pyx(i, j) = input(" = ");
   end 
 end
-#Hace el display de la matriz [P(Y|X)]
+
+#mostrar P(Y|X)
 printf("\nLa matriz P(Y|X) ingresada fue: \n")
 disp(pyx);
-%----------Calculos de los elementos pedidos---------%
+
+%Resultados
 printf("\nResultados:\n")
-%----------------------------------------------------%
-#m=colpx
-#Calculamos la Incertidumbre Promedio de la Entrada del Canal H(X) = -sum(1,m,P(x_i)log_2(P(x_i))
-#como es una sumatoria inicializamos hx en 0
+
+#calcular la incertidumbre promedio de la entrada del canal como H(X) = -sum(1, m, P(x_i)log_2(P(x_i))
+#hx acumula la sumatoria
 hx = 0;
-#Se recorre px donde por cada elemento se ejecuta la formula
-for i=1:colpx           
-  aux = px(i)*log2(px(i));
+
+#hacer la sumatoria
+for i = 1 : colpx           
+  aux = px(i) * log2(px(i));
   hx += aux;
 endfor
-#multiplica hx*-1 debido a que la formula lo indica
-hx = hx*(-1);
-#Se muestra el resultado
-printf("H(X)=");
+
+#multiplicar hx * -1
+hx = hx * -1;
+
+#mostrar H(X)
+printf("H(X) = ");
 disp(hx);
 printf("\n");
-%----------------------------------------------------%
-#Calculamos Probabilidad de Salida P(Y)=P(X)P(Y|X)
+
+#calcular probabilidad de salida P(Y) = P(X) P(Y|X)
 if colpx == rowpyx               
-  py = px*pyx;           
+  py = px * pyx;           
 else
-  #Se indica del error en la multiplicacion de matrices
-  printf("Error, no se pudo calcular P(Y), dimensiones invalidas para P(X) y P(Y|X)\n");
+  #indicar del error en la multiplicación de matrices
+  printf("Error, no se pudo calcular P(Y), dimensiones inválidas para P(X) y P(Y|X)\n");
   return
 endif
-#Se muestra el resultado
-printf("P(Y)=");
+
+#mostrar P(Y)
+printf("P(Y) = ");
 disp(py);
 printf("\n");
-%----------------------------------------------------%
-#Calculamos Matriz de Probabilidad Conjunta P(X,Y)=diag(P(X))P(Y|X)
+
+#calcular la matriz de probabilidad conjunta P(X, Y)=diag(P(X))P(Y|X)
 pxd = diag(px);
 if colpx == rowpyx
-  pxy = pxd*pyx;                 
+  pxy = pxd * pyx;                 
 else
-  disp("Error, no se pudo calcular P(X,Y), dimensiones invalidas para P(X) y P(Y|X)\n");
+  disp("Error, no se pudo calcular P(X, Y), dimensiones invalidas para P(X) y P(Y|X)\n");
   return
 endif
-#Se muestra el resultado
-printf("P(X,Y)= \n");
+
+#mostrar P(X,Y)
+printf("P(X,Y) = \n");
 disp(pxy);
 printf("\n");
-%----------------------------------------------------%
-#m=colpyx
-#n=rowpyx
-#Calculamos la entropia condicional H(Y|X) = -(sum(1,n,sum(1,m,P(xi,yi)log_2(P(yi|xi)))))
+
+#calcular la entropía condicional H(Y|X) = -(sum(1, n, sum(1, m, P(xi, yi)log_2(P(yi|xi)))))
 aux = 0;
-hyx = 0;                                   
-# valida que [P(X,Y)] y [P(Y|X)] tengan el mismo numero de indices
-if rows(pxy) == rowpyx && columns(pxy) == colpyx        
-  #Solo en ese caso se puede realizar la sumatoria
-  for i=1:rowpyx
-    for j=1:colpyx
-      aux = pxy(i,j)*log2(pyx(i,j));
+hyx = 0;  
+                                 
+#validar que P(X,Y) y P(Y|X) tengan las mismas dimensiones
+if rows(pxy) == rowpyx && columns(pxy) == colpyx  
+        
+  #solo en este caso se puede realizar la sumatoria
+  for i = 1 : rowpyx
+    for j = 1 : colpyx
+      aux = pxy(i, j) * log2(pyx(i, j));
       hyx += aux;                            
     endfor
   endfor
-  #multiplica hx*-1 debido a que la formula lo indica
-  hyx = hyx*(-1);
+  
+  #multiplica hx * -1
+  hyx = hyx * -1;
 else
-#Si no tienen el mismo tamaño hay error y termina el programa
-disp("Error, matrices P(X,Y) y P(Y|X) tienen tamaños diferentes")
-return
+  #si no tienen las mismas dimnesiones hay error y termina el programa
+  disp("Error, las matrices P(X, Y) y P(Y|X) tienen tamaños diferentes")
+  return
 endif
-#Se muestra el resultado
+
+#Se muestra H(Y|X)
 printf("H(Y|X) = \n");
 disp(hyx);
 printf("\n");
-%----------------------------------------------------%
-#n=rowpyx
-#Calculamos Incertidumbre Promedio de la Salida del Canal H(Y) = -sum(1,n,P(y_i)log_2(P(y_i))
+
+#calcular la incertidumbre promedio de la salida del canal H(Y) = -sum(1, n, P(y_i)log_2(P(y_i))
 aux = 0;
 hy = 0;
-#se hace la formula para hallar [H(Y)]             
-for i=1:rowpyx
-  aux = py(i)*log2(py(i));
+
+#hallar H(Y)
+for i = 1 : rowpyx
+  aux = py(i) * log2(py(i));
   hy += aux;
 endfor
-#multiplica hx*-1 debido a que la formula lo indica
-hy = hy*(-1);
-#Se muestra el resultado
+
+#multiplica hx * -1
+hy = hy * -1;
+
+#mostrar H(Y)
 printf("H(Y) = ");
 disp(hy);
 printf("\n");
-%----------------------------------------------------%
-#m=colpyx
-#n=rowpyx
-#Calculamos Entropia Conjunta H(X,Y) = -(sum(1,n,sum(1,m,P(xi,yi)log_2(P(yi|xi)))))
+
+#calcular entropía conjunta H(X,Y) = -(sum(1, n, sum(1, m, P(xi, yi)log_2(P(yi|xi)))))
 aux = 0;
 hxy = 0;
-# se procede a hacer la sumatoria doble            
-for i=1:rows(pxy)
-  for j=1:columns(pxy)
-    aux = pxy(i,j)*log2(pxy(i,j));
+
+#hacer la sumatoria doble            
+for i = 1 : rows(pxy)
+  for j = 1 : columns(pxy)
+    aux = pxy(i, j) * log2(pxy(i, j));
     hxy += aux;
   endfor
 endfor
-#se mutliplica por -1 por que la formula lo indica
-hxy = hxy*(-1);
-#Se muestra el resultado
+
+#mutliplicar por -1
+hxy = hxy * -1;
+
+#mostrar H(X,Y)
 printf("H(X,Y) = \n");
 disp(hxy);
 printf("\n");
-%----------------------------------------------------%
-#Calculamos Informacion Mutua I(X;Y) = H(Y) - H(Y|X)
+
+
+#calcular la información mutua I(X;Y) = H(Y) - H(Y|X)
 ixy = hy - hyx;
-#Se muestra el resultado
+
+#mostrar I(X;Y)
 printf("I(X;Y) = ");
 disp(ixy);
 printf("\n");
-%----------------------------------------------------%
-#se chequea si la matriz P(Y|X) es BSC (binary symmetric channel) y si lo es calculamos cs
+
+#revisar si la matriz P(Y|X) es BSC (binary symmetric channel) y si lo es calculamos cs
 #una matriz es BSC si la matriz es cuadrada y ademas si [1,2] = [2,1] = p y [1,1] = [2,2] = 1-p
 isBSC = false;
-if (rowpyx == 2) && (colpyx == 2)
-  if pyx(1,2) == pyx(2,1) && pyx(1,1) == pyx(2,2) && pyx(2,2) == 1 - pyx(1,2)
+if rowpyx == 2 && colpyx == 2
+  if pyx(1, 2) == pyx(2, 1) && pyx(1, 1) == pyx(2, 2) && pyx(2, 2) == 1 - pyx(1, 2)
     isBSC = true;
-    p = pyx(1,2);
-    q = 1-p;
-    cs = 1 + p*log2(p) + q*log2(q);
+    p = pyx(1, 2);
+    q = 1 - p;
+    cs = 1 + p * log2(p) + q * log2(q);
   endif
 endif
-#Se muestra el resultado si es BSC
+
+#mostrar el resultado si es BSC
 if isBSC
   printf("P(Y|X) es BSC, el valor de Cs = ");
   disp(cs);
 else
   printf("P(Y|X) NO es BSC\n");
 endif
-%----------------------------------------------------%
