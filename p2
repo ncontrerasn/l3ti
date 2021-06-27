@@ -1,35 +1,39 @@
-%------------------Punto 2---------------------%
-%Limpiamos la pantalla%
-clc
-%Establecemos el formato long para mas presicion%
-format long
-%----------Pedimos los datos de entrada---------%
-printf("Ingrese la cadena de simbolos: \n");
-s=input("","s");
-#ingresamos el input con el formato
-printf("Ingrese el valor de probabilidad para cada simbolo: \n");
-p=[];
+%Codificador de Huffman
+
+%limpiar pantalla y dar formato a los números
+%recibir símbolos del abacedario
+
+printf("Por simplicidad, un símbolo con un nombre  de más de un carácter (como x1), se representa con una sola letra del abecedario.\n");
+printf("Ingrese la cadena de símbolos: \n");
+s = input("", "s");
+
+#ingresamos la probabilidad de cada símbolo
+printf("Ingrese el valor de probabilidad para cada símbolo: \n");
+p = [];
 sumP = 0;
-#ingresar probabilidades (tienen que sumar 1)
-for i=1:length(s)
-  printf("P(%c)",s(i));
-  p(i) = input("=");
+
+#tienen que sumar 1
+for i = 1 : length(s)
+  printf("P(%c)", s(i));
+  p(i) = input(" = ");
   sumP = sumP + p(i);
 end
-if (1-abs(sumP)>(1*10^(-3)))
-  printf("Error, las probabilidades tienen que sumar 1\n");
+if (1 - abs(sumP) >( 1 * 10^(-3)))
+  printf("Error, las probabilidades tienen que sumar 1.\n");
   return
 endif
-%----------------------------------------------------%
-#Se ordena el arreglo de probabilidades en orden desendente
-#y se modifica el orden de la cadena de simbolos segun corresponda
-for m = 1:length(p)
-	for n = 1:length(p)
+
+#ordenar el arreglo de probabilidades desendentemente
+#y modificar el orden de la cadena de símbolos segun corresponda
+for m = 1 : length(p)
+	for n = 1 : length(p)
 		if p(m) > p(n)
+      
       #orden de p
 			a = p(n);
 			p(n) = p(m);
       p(m) = a;
+      
       #orden de s
       c = s(n);
       s(n) = s(m);
@@ -37,123 +41,149 @@ for m = 1:length(p)
 		end
 	end
 end
-%--------------------Implementamos el algoritmo de Huffman--------------------------------%
+
+%algoritmo de Huffman
 fprintf("\nCodificacion por caracter: \n\n");
-%Guardamos los valores originales de p y s
+
+%guardar los valores originales de p y s
 origS = s;
 origP = p;
-#Establecemos una variable para el tamaño del codigo por ciclo y un arreglo que los almacene todos
+
+#establecer una variable para el tamaño del codigo por ciclo y un arreglo que los almacene todos
 tempSize = 0;
 codeSize = [];
 
-%Empezamos el proceso para encontrar el código de cada valor.
-for n = 1:length(s)
-  #Se guarda el caracter con el que estamos trabajando
+%empezar el proceso para encontrar el código de cada símbolo
+for n = 1 : length(s)
+  
+  #guardar el carácter con el que estamos trabajando
 	cAtn = s(n);
   
-  #Definimos el arreglo "codigo" para mostrar el codigo resultante para cada caracter
-  #Inicializamos el codigo vacio
+  #definir el arreglo "codigo" para mostrar el código resultante para cada carácter
+  #inicializar el código vacío
 	codigo = [''];
   
-  #Establecemos una variable para la longitud de p
+  #establecemos una variable para la longitud de p
   lenP = length(p);
 	
-  #Mientras queden probabilidades con las que trabajar
+  #mientras queden probabilidades con las que trabajar
 	while lenP > 1				
 				
-    #Se suman los ultimos dos valores de probabilidad
+    #sumar los últimos dos valores de probabilidad
 		aux1 = p(lenP) + p(lenP - 1);
 		aux2 = 0;
-    #se verifica si el caracter actual es igual al que se encuentra al final de la cadena
+    
+    #verificar si el carácter actual es igual al que se encuentra al final de la cadena
 		if cAtn == s(length(s))
-      #Si es asi, se concatena por la izquierda a su codigo un 1
+      
+      #si es así, se concatena por la izquierda a su código un 1
 			codigo = ['1', codigo];
-      #Como se involucro en la suma, se guarda su valor
+      
+      #como se involucró en la suma, se guarda su valor
 			aux2 = cAtn;
-      #Se incrementa la variable que registra el tamaño del codigo
+      
+      #incrementar la variable que registra el tamaño del código
       tempSize = tempSize + 1;
-      #se verifica si el caracter actual se encuentra penultimo en la cadena
+      
+      #verificar si el carácter actual se encuentra penúltimo en la cadena
     elseif  cAtn == s(length(s) - 1)
-      #Si es asi, se concatena por la izquierda a su codigo un 1
+      
+      #si es así, se concatena por la izquierda a su código un 1
 			codigo = ['0', codigo];
-      #Como se involucro en la suma, se guarda su valor
+      
+      #como se involucró en la suma, se guarda su valor
 			aux2 = cAtn;
-      #Se incrementa la variable que registra el tamaño del codigo
+      
+      #incrementar la variable que registra el tamaño del código
       tempSize = tempSize + 1;
 		else
-			#Si no es ninguno de los 2, no se hace nada.
+      
+			#si no es ninguno de los 2, no se hace nada
 		endif
 		
-    #Se genera un nuevo vector de probabilidades donde se eliminan los ultimos 2 valores
+    #generar un nuevo arreglo de probabilidades donde se eliminan los últimos 2 valores
     #y se remplazan por el valor de la suma calculada
-		p = [p(1:length(p)-2), aux1];
-    #Este vector se ordena descendentemente
+		p = [p(1 : length(p) - 2), aux1];
+    
+    #se ordena descendentemente
 		p = sort(p, 'descend');
-    #Se actualiza la variable del tamaño de p
+    
+    #actualizar la variable del tamaño de p
     lenP = length(p);
 		
-    #Buscamos la posicion donde quedo la probabilidad resultante de la suma
+    #buscamor la posición donde quedó la probabilidad resultante de la suma
     #y se guarda en chP
 		chP = 0;
-		for temp = 1:lenP
+		for temp = 1 : lenP
 			if p(temp) == aux1;
 				chP = temp;
 			end
 		end
 		
-    #Se genera un nuevo vector de simbolos sin las dos ultimas posiciones
-		s = [s(1:length(s)-2)];
-    #Corremos todas las posiciones después del número cambiado.
-		for i = length(s):-1:chP
-			s(i+1) = s(i);
+    #generar un nuevo arreglo de símbolos sin las dos ultimas posiciones
+		s = [s(1 : length(s) - 2)];
+    
+    #correr todas las posiciones después del número cambiado
+		for i = length(s): -1 : chP
+			s(i + 1) = s(i);
 		end
-    #En la posicion chP se coloca nuestro caracter cAtn si se incluye en la suma, en el caso que no se coloca 0
+    
+    #en la posicion chP se coloca nuestro caracter cAtn si se incluye en la suma, en el caso que no se coloca 0
 		s(chP) = aux2;
 	end
-  #se agrega el tamaño del codigo calculado al arreglo de tamaños
+  
+  #se agrega el tamaño del código calculado al arreglo de tamaños
 	codeSize = [codeSize,tempSize];
   tempSize = 0;
-  #Se muestra el codigo resultante
+  
+  #moestrar el código resultante
   fprintf("%c -> ",cAtn);
   disp(codigo);
-  #Se restauran los vectores a sus valores originales
+  
+  #restaurar los vectores a sus valores originales
 	p = origP;
 	s = origS;
 end
-%----------------------------------------------------%
+
+%reporte de resultados
 fprintf("\nResultados: \n\n");
-%----------------------------------------------------%
-#Calculamos la entropia H(X) = -sum(1,m,P(x_i)log_2(P(x_i))
-m=length(p);
-#como es una sumatoria inicializamos hx en 0
+
+#calcular la entropia como H(X) = -sum(1,m,P(x_i)log_2(P(x_i))
+m = length(p);
+
+#acumulador para la sumatoria
 hx = 0;
-#Se recorre px donde por cada elemento se ejecuta la formula
-for i=1:m
-  aux = p(i)*log2(p(i));
+
+#for de la sumatoria
+for i = 1 : m
+  aux = p(i) * log2(p(i));
   hx += aux;
 endfor
-#multiplica hx*-1 debido a que la formula lo indica
-hx = hx*(-1);
-#Se muestra el resultado
-printf("H(X)=");
+
+#multiplicar hx * -1
+hx = hx * -1;
+
+#mostrar el resultado
+printf("H(X) = ");
 disp(hx);
 printf("\n");
-%----------------------------------------------------%
-#Calculamos la longitud de codigo promedio L = sum(1,m,P(x_i)n_i)
+
+#calcular la longitud de código promedio como L = sum(1,m,P(x_i)n_i)
 #n_i = longitud del codigo i
 L = 0;
-for i = 1:m
-  L = L + (p(i)*codeSize(i));
+for i = 1 : m
+  L = L + (p(i) * codeSize(i));
 end
-#Se muestra el resultado
-printf("L=");
+
+#mostrar el resultado
+printf("L = ");
 disp(L);
 printf("\n");
-%----------------------------------------------------%
-%Calculamos la eficiencia de codificacion CE = H(X)/L
-CE = HX/L;
-#Se muestra el resultado
-printf("CE=");
+
+%calcular la eficiencia de codificacion eta como CE = H(X)/L
+CE = hx / L;
+
+#mostrar el resultado
+printf("Eta = ");
 disp(CE);
 printf("\n");
-%----------------------------------------------------%
